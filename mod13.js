@@ -56,8 +56,8 @@ function rand(min,max){
 }
 
 function gen_prob(){
-  lvalue = Math.floor( Math.random() * modulo ) ;
-  rvalue = Math.floor( Math.random() * modulo ) ;
+  lvalue = rand(2,12);
+  rvalue = rand(2,12);
 
   switch (proboption){
     case "arithmetic":

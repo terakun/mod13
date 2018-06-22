@@ -179,5 +179,10 @@ function typeGame(evt){
     input += String(kc-48);
     show_prob();
   }
+  if(96 <= kc && kc <= 105 && input.length <= 1 && input != "0" ){
+    input += String(kc-96);
+    show_prob();
+  }
+
 }
 

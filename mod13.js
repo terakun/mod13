@@ -98,7 +98,11 @@ function gen_prob(){
       }
       break;
   }
-  prob_str = String(lvalue) + opstr[op] + String(rvalue) + "=";
+  if(op != opes.POW){
+    prob_str = String(lvalue) + opstr[op] + String(rvalue) + "=";
+  }else{
+    prob_str = String(lvalue) + opstr[op] + "{" +  String(rvalue) + "} =";
+  }
 }
 
 function show_prob(){

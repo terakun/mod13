@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <ul>
       <li>数を入力してEnter</li>
       <li>入力は$0,1,\cdots,12$</li>
+      <li>1分速解きはミスしたら-5秒</li>
     </ul>
     <div id="difficulty">
       <input type="radio" name="diff" value="arithmetic" checked> 四則演算
@@ -28,9 +29,14 @@ document.addEventListener("DOMContentLoaded", function(){
       <input type="radio" name="diff" value="muldivpow"> 掛け算，割り算，べき乗
     </div>
 
+    <div id="mode">
+      <input type="radio" name="mode" value="prob" checked> 10問速解き
+      <input type="radio" name="mode" value="time"> 1分間速解き
+    </div>
+
     <div id="start">Press any key</div>
     <div id="problemnumber"></div>
     <div id="problem"></div>
-    <div id="timer"></div>
+    <div id="status"></div>
   </body>
 </html>

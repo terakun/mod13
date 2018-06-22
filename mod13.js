@@ -1,21 +1,22 @@
-document.onkeydown = gameSet;
+document.onkeydown = set_game;
 
-var cnt=0;             //何問目か格納
-var typStart,typEnd;   //開始時と終了時の時刻を格納
-var probsize = 10;
-var prob_str = "";
-var input = "";
-var ans = 0;
-var miss_num = 0;
-var elements;
-var proboption = "";
+let cnt=0;          
+let typStart,typEnd;
+let probsize = 10;
+let prob_str = "";
+let input = "";
+let ans = 0;
+let miss_num = 0;
+let elements;
+let proboption = "";
 
-var modulo = 13;
-var lvalue = 0;
-var rvalue = 0;
-var op = 0;
-var opstr = new Array("+","-","\\times","\\div","^");
-var opes = {
+let modulo = 13;
+let lvalue = 0;
+let rvalue = 0;
+
+let op = 0;
+let opstr = new Array("+","-","\\times","\\div","^");
+let opes = {
   ADD : 0,
   SUB : 1,
   MUL : 2,
@@ -23,31 +24,45 @@ var opes = {
   POW : 4
 };
 
+let modes = {
+  PROB : "prob",
+  TIME : "time",
+}
+
 function startShowing() {
-   PassageID = setInterval('showPassage()',100);
+   PassageID = setInterval('timer_event()',100);
 }
 
 function stopShowing() {
    clearInterval( PassageID );
 }
 
-function showPassage() {
+function timer_event() {
   typEnd = new Date();
-  var keika = typEnd - typStart;
-  var sec = Math.floor( keika/1000 );
-  var mes = "時間："+sec+"秒"+"<br>ミス:"+miss_num+"回";
-  document.getElementById("timer").innerHTML = mes;
+  let keika = typEnd - typStart;
+  let sec = Math.floor( keika/1000 );
+  let mes = "";
+  switch (mode) {
+    case modes.PROB:
+      mes = "時間："+sec+"秒"+"<br>ミス:"+miss_num+"回";
+      break;
+    case modes.TIME:
+      remain = 60 - sec - 5 * miss_num;
+      if(remain < 0){
+        end_game();
+        return;
+      }
+      mes = "残り時間："+remain+"秒"+"<br>解いた数:"+cnt;
+      break;
+  }
+  document.getElementById("status").innerHTML = mes;
 }
 
 function xgcd(a, b) { 
    if (b == 0) {
      return [1, 0, a];
    }
-
-   temp = xgcd(b, a % b);
-   x = temp[0];
-   y = temp[1];
-   d = temp[2];
+   [x,y,d] = xgcd(b, a % b);
    return [y, x-y*Math.floor(a/b), d];
 }
 
@@ -56,8 +71,8 @@ function rand(min,max){
 }
 
 function gen_prob(){
-  lvalue = rand(2,12);
-  rvalue = rand(2,12);
+  lvalue = rand(2,modulo-1);
+  rvalue = rand(2,modulo-1);
 
   switch (proboption){
     case "arithmetic":
@@ -79,21 +94,15 @@ function gen_prob(){
       ans = ( lvalue - rvalue + modulo ) % modulo;
       break;
     case opes.MUL:
-      ans = ( lvalue * rvalue )%modulo;
+      ans = ( lvalue * rvalue ) % modulo;
       break;
     case opes.DIV:
-      while(rvalue==0){
-        rvalue = Math.floor( Math.random() * modulo ) ;
-      }
       rvalue_inv = xgcd(rvalue,modulo)[0];
-      ans = ( lvalue * (rvalue_inv+modulo) ) % modulo;
+      ans = ( lvalue * ( rvalue_inv + modulo ) ) % modulo;
       break;
     case opes.POW:
-      while(lvalue==0){
-        lvalue = Math.floor( Math.random() * modulo ) ;
-      }
       ans = 1;
-      for(var i=0;i<rvalue;++i){
+      for(let i=0;i<rvalue;++i){
         ans = ans * lvalue % modulo;
       }
       break;
@@ -106,7 +115,9 @@ function gen_prob(){
 }
 
 function show_prob(){
-  document.getElementById("problemnumber").innerHTML = "No." + String(cnt+1) + "/" + String(probsize);
+  if( mode == modes.PROB ){
+    document.getElementById("problemnumber").innerHTML = "No." + String(cnt+1) + "/" + String(probsize);
+  }
   document.getElementById("problem").innerHTML = "$" + prob_str + input + "$" ;
   renderMathInElement(
       document.body,{
@@ -115,55 +126,63 @@ function show_prob(){
         {left: "$", right: "$", display: false}]})
 }
 
-function gameSet(){
+function set_game(){
   cnt=0;
   typStart = new Date();
 
-  document.onkeydown = typeGame;
+  document.onkeydown = update_game;
   document.getElementById("start").innerHTML = "";
   elements = document.getElementsByName( "diff" ) ;
-
-  for ( var a="", i=elements.length; i--; ) {
+  for ( let a="", i=elements.length; i--; ) {
     if ( elements[i].checked ) {
       proboption = elements[i].value ;
       break ;
     }
   }
+
+  elements = document.getElementsByName( "mode" ) ;
+  for ( let a="", i=elements.length; i--; ) {
+    if ( elements[i].checked ) {
+      mode = elements[i].value ;
+      break ;
+    }
+  }
+
   gen_prob();
   show_prob();
   startShowing();
-
 }
 
-function typeGame(evt){
-  var kc;
+function key2num(kc){
+  if(48 <= kc && kc <= 57){
+    return kc - 48;
+  }else if(96 <= kc && kc <= 105){
+    return kc - 96;
+  }else{
+    return null;
+  }
+}
+
+function update_game(evt){
+  let kc;
   if(document.all){
     kc = event.keyCode;
   }else{
     kc = evt.which;
   }
+
   if(input.length>=1 && kc == 13){
     if( Number(input) == ans ){
       cnt++;
-      if ( cnt < probsize ){
-        prob = gen_prob();
-        input = "";
-        show_prob();
+      prob = gen_prob();
+      input = "";
+
+      if( mode == modes.PROB && cnt >= probsize ){
+        end_game();
       }else{
-        typEnd = new Date();
-        var keika = typEnd - typStart;
-        var sec = Math.floor( keika/1000 );
-        var fin="GAME終了　時間："+sec+"秒"+" ミス:"+miss_num+"回";
-        document.onkeydown = gameSet;
-        cnt = 0;
-        miss_num = 0;
-        input = "";
-        prob_str = "";
-        document.getElementById("start").innerHTML = "Enterでスタート";
-        document.getElementById("timer").innerHTML = fin;
-        stopShowing();
-        typStart = typEnd;
+        show_prob();
       }
+
     }else{
       miss_num++;
       input = "";
@@ -175,14 +194,32 @@ function typeGame(evt){
     show_prob();
   }
 
-  if(48 <= kc && kc <= 57 && input.length <= 1 && input != "0" ){
-    input += String(kc-48);
+  knum = key2num(kc);
+  if( knum != null && (( input.length == 0 ) || ( input == "1" && knum < 3 )) ){
+    input += String(knum);
     show_prob();
   }
-  if(96 <= kc && kc <= 105 && input.length <= 1 && input != "0" ){
-    input += String(kc-96);
-    show_prob();
+}
+
+function end_game(){
+  if( mode == modes.PROB ){
+    typEnd = new Date();
+    let keika = typEnd - typStart;
+    let sec = Math.floor( keika/1000 );
+    let fin="終了 時間："+sec+"秒"+" ミス:"+miss_num+"回";
+    document.getElementById("status").innerHTML = fin;
+  }else{
+    let fin = "解いた数:"+cnt;
+    document.getElementById("status").innerHTML = fin;
   }
 
+  document.onkeydown = set_game;
+  cnt = 0;
+  miss_num = 0;
+  input = "";
+  prob_str = "";
+  document.getElementById("start").innerHTML = "Press any key";
+  stopShowing();
+  typStart = typEnd;
 }
 

@@ -14,7 +14,7 @@ var modulo = 13;
 var lvalue = 0;
 var rvalue = 0;
 var op = 0;
-var opstr = new Array("＋","ー","×","÷","^");
+var opstr = new Array("+","-","\\times","\\div","^");
 var opes = {
   ADD : 0,
   SUB : 1,
@@ -103,7 +103,12 @@ function gen_prob(){
 
 function show_prob(){
   document.getElementById("problemnumber").innerHTML = "No." + String(cnt+1) + "/" + String(probsize);
-  document.getElementById("problem").innerHTML = prob_str + input ;
+  document.getElementById("problem").innerHTML = "$" + prob_str + input + "$" ;
+  renderMathInElement(
+      document.body,{
+        delimiters: [
+        {left: "$$", right: "$$", display: true},
+        {left: "$", right: "$", display: false}]})
 }
 
 function gameSet(){

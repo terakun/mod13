@@ -1,9 +1,8 @@
-document.onkeydown = typeGame;  //キー押下時に関数typeGame()を呼び出す
+document.onkeydown = gameSet;
 
-//グローバル変数群
 var cnt=0;             //何問目か格納
 var typStart,typEnd;   //開始時と終了時の時刻を格納
-var probsize = 10;
+var probsize = 3;
 var prob_str = "";
 var input = "";
 var ans = 0;
@@ -22,8 +21,24 @@ var opes = {
   POW : 4
 };
 
-function xgcd(a, b) { 
 
+function startShowing() {
+   PassageID = setInterval('showPassage()',100);
+}
+
+function stopShowing() {
+   clearInterval( PassageID );
+}
+
+function showPassage() {
+  typEnd = new Date();
+  var keika = typEnd - typStart;
+  var sec = Math.floor( keika/1000 );
+  var mes = "時間："+sec+"秒"+"<br>ミス:"+miss_num+"回";
+  document.getElementById("timer").innerHTML = mes;
+}
+
+function xgcd(a, b) { 
    if (b == 0) {
      return [1, 0, a];
    }
@@ -74,7 +89,6 @@ function gen_prob(){
 function show_prob(){
   document.getElementById("problemnumber").innerHTML = "No." + String(cnt+1) + "/" + String(probsize);
   document.getElementById("problem").innerHTML = prob_str + input ;
-  // document.getElementById("answer").innerHTML = String(ans);
 }
 
 function gameSet(){
@@ -82,6 +96,10 @@ function gameSet(){
   typStart = new Date();
   gen_prob();
   show_prob();
+  startShowing();
+  console.log("hello");
+  document.onkeydown = typeGame;
+  document.getElementById("start").innerHTML = "";
 }
 
 function typeGame(evt){
@@ -91,8 +109,7 @@ function typeGame(evt){
   }else{
     kc = evt.which;
   }
-
-  if(kc == 13){
+  if(input.length>=1 && kc == 13){
     if( Number(input) == ans ){
       cnt++;
       if ( cnt < probsize ){
@@ -103,11 +120,15 @@ function typeGame(evt){
         typEnd = new Date();
         var keika = typEnd - typStart;
         var sec = Math.floor( keika/1000 );
-        var msec = keika % 1000;
-
-        var fin="GAME終了　時間："+sec+"秒"+msec+" ミス:"+miss_num+"回";
-
-        document.getElementById("finish").innerHTML = fin;
+        var fin="GAME終了　時間："+sec+"秒"+" ミス:"+miss_num+"回";
+        document.onkeydown = gameSet;
+        cnt = 0;
+        miss_num = 0;
+        prob_str = "";
+        document.getElementById("start").innerHTML = "Enterでスタート";
+        document.getElementById("timer").innerHTML = fin;
+        stopShowing();
+        typStart = typEnd;
       }
     }else{
       miss_num++;

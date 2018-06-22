@@ -2,11 +2,13 @@ document.onkeydown = gameSet;
 
 var cnt=0;             //何問目か格納
 var typStart,typEnd;   //開始時と終了時の時刻を格納
-var probsize = 3;
+var probsize = 10;
 var prob_str = "";
 var input = "";
 var ans = 0;
 var miss_num = 0;
+var elements;
+var proboption = "";
 
 var modulo = 13;
 var lvalue = 0;
@@ -20,7 +22,6 @@ var opes = {
   DIV : 3,
   POW : 4
 };
-
 
 function startShowing() {
    PassageID = setInterval('showPassage()',100);
@@ -50,10 +51,25 @@ function xgcd(a, b) {
    return [y, x-y*Math.floor(a/b), d];
 }
 
+function rand(min,max){
+  return Math.floor( Math.random() * (max + 1 - min) ) + min ;
+}
+
 function gen_prob(){
   lvalue = Math.floor( Math.random() * modulo ) ;
   rvalue = Math.floor( Math.random() * modulo ) ;
-  op = Math.floor( Math.random() * 5 );
+
+  switch (proboption){
+    case "arithmetic":
+      op = rand(0,3);
+      break;
+    case "all":
+      op = rand(0,4);
+      break;
+    case "muldivpow":
+      op = rand(2,4);
+      break;
+  }
 
   switch (op) {
     case opes.ADD:
@@ -73,9 +89,8 @@ function gen_prob(){
       ans = ( lvalue * (rvalue_inv+modulo) ) % modulo;
       break;
     case opes.POW:
-      while(lvalue==0&&rvalue==0){
+      while(lvalue==0){
         lvalue = Math.floor( Math.random() * modulo ) ;
-        rvalue = Math.floor( Math.random() * modulo ) ;
       }
       ans = 1;
       for(var i=0;i<rvalue;++i){
@@ -94,12 +109,21 @@ function show_prob(){
 function gameSet(){
   cnt=0;
   typStart = new Date();
+
+  document.onkeydown = typeGame;
+  document.getElementById("start").innerHTML = "";
+  elements = document.getElementsByName( "diff" ) ;
+
+  for ( var a="", i=elements.length; i--; ) {
+    if ( elements[i].checked ) {
+      proboption = elements[i].value ;
+      break ;
+    }
+  }
   gen_prob();
   show_prob();
   startShowing();
-  console.log("hello");
-  document.onkeydown = typeGame;
-  document.getElementById("start").innerHTML = "";
+
 }
 
 function typeGame(evt){
@@ -124,6 +148,7 @@ function typeGame(evt){
         document.onkeydown = gameSet;
         cnt = 0;
         miss_num = 0;
+        input = "";
         prob_str = "";
         document.getElementById("start").innerHTML = "Enterでスタート";
         document.getElementById("timer").innerHTML = fin;

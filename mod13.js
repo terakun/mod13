@@ -1,62 +1,71 @@
-document.onkeydown = set_game;
 
-let cnt=0;          
-let typStart,typEnd;
-let probsize = 10;
-let prob_str = "";
-let input = "";
-let ans = 0;
-let miss_num = 0;
-let elements;
-let proboption = "";
+Game = function(probsize,sec,modulo) {
+  this.probsize = probsize;
+  this.sec = sec;
+  this.modulo = modulo;
+  this.cnt = 0;
+  this.typStart = 0;
+  this.typEnd = 0;
 
-let modulo = 13;
-let lvalue = 0;
-let rvalue = 0;
+  this.op = 0;
+  this.opstr = new Array("+","-","\\times","\\div","^");
+  this.opes = {
+    ADD : 0,
+    SUB : 1,
+    MUL : 2,
+    DIV : 3,
+    POW : 4
+  };
 
-let op = 0;
-let opstr = new Array("+","-","\\times","\\div","^");
-let opes = {
-  ADD : 0,
-  SUB : 1,
-  MUL : 2,
-  DIV : 3,
-  POW : 4
+  this.modes = {
+    PROB : "prob",
+    TIME : "time",
+  };
+  this.mode = "";
+
+  this.lvalue = 0;
+  this.rvalue = 0;
+
+  this.cnt = 0;
+  this.prob_str = "";
+
+  this.input = "";
+  this.ans = 0;
+  this.miss_num = 0;
+  this.proboption = "";
+
+  this.PassageID = 0;
 };
 
-let modes = {
-  PROB : "prob",
-  TIME : "time",
-}
 
-function startShowing() {
-   PassageID = setInterval('timer_event()',100);
-}
+Game.prototype.start_timer = function(){
+   this.PassageID = setInterval(function(){ game.timer_event(); },100);
+};
 
-function stopShowing() {
-   clearInterval( PassageID );
-}
+Game.prototype.stop_timer = function(){
+   clearInterval( this.PassageID );
+};
 
-function timer_event() {
-  typEnd = new Date();
-  let keika = typEnd - typStart;
+Game.prototype.timer_event = function(){
+  this.typEnd = new Date();
+  let keika = this.typEnd - this.typStart;
   let sec = Math.floor( keika/1000 );
   let mes = "";
-  switch (mode) {
-    case modes.PROB:
-      mes = "時間："+sec+"秒"+"<br>ミス:"+miss_num+"回";
+  switch (this.mode) {
+    case this.modes.PROB:
+      mes = "時間："+sec+"秒"+"<br>ミス:"+this.miss_num+"回";
       break;
-    case modes.TIME:
-      remain = 60 - sec - 5 * miss_num;
+    case this.modes.TIME:
+      remain = this.sec - sec - 5 * this.miss_num;
       if(remain < 0){
-        end_game();
+        this.end_game();
         return;
       }
-      mes = "残り時間："+remain+"秒"+"<br>解いた数:"+cnt;
+      mes = "残り時間："+remain+"秒"+"<br>解いた数:"+this.cnt;
       break;
   }
   document.getElementById("status").innerHTML = mes;
-}
+};
 
 function xgcd(a, b) { 
    if (b == 0) {
@@ -64,61 +73,57 @@ function xgcd(a, b) {
    }
    [x,y,d] = xgcd(b, a % b);
    return [y, x-y*Math.floor(a/b), d];
-}
+};
 
 function rand(min,max){
   return Math.floor( Math.random() * (max + 1 - min) ) + min ;
-}
+};
 
-function gen_prob(){
-  lvalue = rand(2,modulo-1);
-  rvalue = rand(2,modulo-1);
+Game.prototype.gen_prob = function(){
+  this.lvalue = rand(2,this.modulo-1);
+  this.rvalue = rand(2,this.modulo-1);
 
-  switch (proboption){
+  switch (this.proboption){
     case "arithmetic":
-      op = rand(0,3);
+      this.op = rand(0,3);
       break;
     case "all":
-      op = rand(0,4);
+      this.op = rand(0,4);
       break;
     case "muldivpow":
-      op = rand(2,4);
+      this.op = rand(2,4);
       break;
   }
 
-  switch (op) {
-    case opes.ADD:
-      ans = ( lvalue + rvalue ) % modulo;
+  switch (this.op) {
+    case this.opes.ADD:
+      this.ans = ( this.lvalue + this.rvalue ) % this.modulo;
       break;
-    case opes.SUB:
-      ans = ( lvalue - rvalue + modulo ) % modulo;
+    case this.opes.SUB:
+      this.ans = ( this.lvalue - this.rvalue + this.modulo ) % this.modulo;
       break;
-    case opes.MUL:
-      ans = ( lvalue * rvalue ) % modulo;
+    case this.opes.MUL:
+      this.ans = ( this.lvalue * this.rvalue ) % this.modulo;
       break;
-    case opes.DIV:
-      rvalue_inv = xgcd(rvalue,modulo)[0];
-      ans = ( lvalue * ( rvalue_inv + modulo ) ) % modulo;
+    case this.opes.DIV:
+      rvalue_inv = xgcd(this.rvalue,this.modulo)[0];
+      this.ans = ( this.lvalue * ( rvalue_inv + this.modulo ) ) % this.modulo;
       break;
-    case opes.POW:
-      ans = 1;
-      for(let i=0;i<rvalue;++i){
-        ans = ans * lvalue % modulo;
+    case this.opes.POW:
+      this.ans = 1;
+      for(let i=0;i<this.rvalue;++i){
+        this.ans = this.ans * this.lvalue % this.modulo;
       }
       break;
   }
-  if(op != opes.POW){
-    prob_str = String(lvalue) + opstr[op] + String(rvalue) + "=";
+  if(this.op != this.opes.POW){
+    this.prob_str = String(this.lvalue) + this.opstr[this.op] + String(this.rvalue) + "=";
   }else{
-    prob_str = String(lvalue) + opstr[op] + "{" +  String(rvalue) + "} =";
+    this.prob_str = String(this.lvalue) + this.opstr[this.op] + "{" +  String(this.rvalue) + "} =";
   }
-}
+};
 
-function show_prob(){
-  if( mode == modes.PROB ){
-    document.getElementById("problemnumber").innerHTML = "No." + String(cnt+1) + "/" + String(probsize);
-  }
-  document.getElementById("problem").innerHTML = "$" + prob_str + input + "$" ;
+function render_math(){
   renderMathInElement(
       document.body,{
         delimiters: [
@@ -126,32 +131,54 @@ function show_prob(){
         {left: "$", right: "$", display: false}]})
 }
 
-function set_game(){
-  cnt=0;
-  typStart = new Date();
+Game.prototype.show_prob = function(){
+  if( this.mode == this.modes.PROB ){
+    document.getElementById("problemnumber").innerHTML = "No." + String(this.cnt+1) + "/" + String(this.probsize);
+  }
+  document.getElementById("problem").innerHTML = "$" + this.prob_str + this.input + "$" ;
+  render_math();
+};
 
-  document.onkeydown = update_game;
-  document.getElementById("start").innerHTML = "";
-  elements = document.getElementsByName( "diff" ) ;
+function selected_radio_element(elemid){
+  let elements = document.getElementsByName( elemid ) ;
   for ( let a="", i=elements.length; i--; ) {
     if ( elements[i].checked ) {
-      proboption = elements[i].value ;
-      break ;
+      return elements[i].value;
     }
   }
-
-  elements = document.getElementsByName( "mode" ) ;
-  for ( let a="", i=elements.length; i--; ) {
-    if ( elements[i].checked ) {
-      mode = elements[i].value ;
-      break ;
-    }
-  }
-
-  gen_prob();
-  show_prob();
-  startShowing();
+  return null;
 }
+
+Game.prototype.hoge = function(){
+  return this.cnt;
+};
+
+Game.prototype.init_game = function(evt){
+  console.log("hello");
+  let kc;
+  if(document.all){
+    kc = event.keyCode;
+  }else{
+    kc = evt.which;
+  }
+  if( kc != 13 ) return;
+
+  console.log(this.hoge());
+  this.cnt=0;
+  this.typStart = new Date();
+
+  document.onkeydown = function(evt){
+    game.update_game(evt);
+  }
+  document.getElementById("start").innerHTML = "";
+
+  this.proboption = selected_radio_element( "diff" );
+  this.mode = selected_radio_element( "mode" );
+
+  this.gen_prob();
+  this.show_prob();
+  this.start_timer();
+};
 
 function key2num(kc){
   if(48 <= kc && kc <= 57){
@@ -163,7 +190,12 @@ function key2num(kc){
   }
 }
 
-function update_game(evt){
+Game.prototype.validinput = function(knum){
+  let num = Number(this.input + String(knum));
+  return this.input !== "0" && 0 <= num && num < this.modulo;
+}
+
+Game.prototype.update_game = function(evt){
   let kc;
   if(document.all){
     kc = event.keyCode;
@@ -171,55 +203,65 @@ function update_game(evt){
     kc = evt.which;
   }
 
-  if(input.length>=1 && kc == 13){
-    if( Number(input) == ans ){
-      cnt++;
-      prob = gen_prob();
-      input = "";
+  if(this.input.length>=1 && kc == 13){
+    if( Number(this.input) == this.ans ){
+      this.cnt++;
+      this.gen_prob();
+      this.input = "";
 
-      if( mode == modes.PROB && cnt >= probsize ){
-        end_game();
+      if( this.mode == this.modes.PROB && this.cnt >= this.probsize ){
+        this.end_game();
       }else{
-        show_prob();
+        this.show_prob();
       }
 
     }else{
-      miss_num++;
-      input = "";
-      show_prob();
+      this.miss_num++;
+      this.input = "";
+      this.show_prob();
     }
   }
-  if(kc == 8 && input.length >= 1){
-    input = input.substr(0,input.length-1);
-    show_prob();
+  if(kc == 8 && this.input.length >= 1){
+    this.input = this.input.substr(0,this.input.length-1);
+    this.show_prob();
   }
 
   knum = key2num(kc);
-  if( knum != null && (( input.length == 0 ) || ( input == "1" && knum < 3 )) ){
-    input += String(knum);
-    show_prob();
+  if( knum != null && this.validinput( knum ) ){
+    this.input += String(knum);
+    this.show_prob();
   }
-}
+};
 
-function end_game(){
-  if( mode == modes.PROB ){
-    typEnd = new Date();
-    let keika = typEnd - typStart;
+Game.prototype.end_game = function(){
+  if( this.mode == this.modes.PROB ){
+    this.typEnd = new Date();
+    let keika = this.typEnd - this.typStart;
     let sec = Math.floor( keika/1000 );
-    let fin="終了 時間："+sec+"秒"+" ミス:"+miss_num+"回";
+    let fin="終了 時間："+sec+"秒"+" ミス:"+this.miss_num+"回";
     document.getElementById("status").innerHTML = fin;
   }else{
-    let fin = "解いた数:"+cnt;
+    let fin = "解いた数:"+this.cnt;
     document.getElementById("status").innerHTML = fin;
+    document.getElementById("problem").innerHTML = "$" + this.prob_str + this.ans + "$" ;
+    render_math();
   }
 
-  document.onkeydown = set_game;
-  cnt = 0;
-  miss_num = 0;
-  input = "";
-  prob_str = "";
-  document.getElementById("start").innerHTML = "Press any key";
-  stopShowing();
-  typStart = typEnd;
+  document.onkeydown = function(evt){
+    game.init_game(evt);
+  }
+  this.cnt = 0;
+  this.miss_num = 0;
+  this.input = "";
+  this.prob_str = "";
+  document.getElementById("start").innerHTML = "Press Enter to start";
+  this.stop_timer();
+  this.typStart = this.typEnd;
+};
+
+let game = new Game(10,60,13);
+document.onkeydown = function(evt){
+  game.init_game(evt); 
 }
+
 

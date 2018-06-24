@@ -1,7 +1,4 @@
 # mod13
-calculating practice for Z/13Z
+位数13の有限体上での計算練習ができます
 
-mod 13 スピードの練習用に作った
-
-ここからプレイできます
 https://terakun.github.io/mod13/

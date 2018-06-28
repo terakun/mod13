@@ -26,7 +26,7 @@ table#tenkey {
   margin-left:auto;
   margin-right:auto;
   margin-top:1.0rem;
-  margin-bottom:1.0rem;
+  margin-bottom:2.0rem;
   table-layout: fixed;
   visibility: hidden;
 }

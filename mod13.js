@@ -1,4 +1,3 @@
-
 Game = function(probsize,sec,modulo) {
   this.probsize = probsize;
   this.sec = sec;
@@ -16,6 +15,12 @@ Game = function(probsize,sec,modulo) {
     DIV : 3,
     POW : 4
   };
+
+  this.states = {
+    READY : 0,
+    PLAY : 1,
+  }
+  this.state = this.states.READY;
 
   this.modes = {
     PROB : "prob",
@@ -39,17 +44,17 @@ Game = function(probsize,sec,modulo) {
 
 
 Game.prototype.start_timer = function(){
-   this.PassageID = setInterval(function(){ game.timer_event(); },100);
+  this.PassageID = setInterval(function(){ game.timer_event(); },100);
 };
 
 Game.prototype.stop_timer = function(){
-   clearInterval( this.PassageID );
+  clearInterval( this.PassageID );
 };
 
 Game.prototype.timer_event = function(){
   this.typEnd = new Date();
-  let keika = this.typEnd - this.typStart;
-  let sec = Math.floor( keika/1000 );
+  let elapsed = this.typEnd - this.typStart;
+  let sec = Math.floor( elapsed/1000 );
   let mes = "";
   switch (this.mode) {
     case this.modes.PROB:
@@ -68,15 +73,15 @@ Game.prototype.timer_event = function(){
 };
 
 function xgcd(a, b) { 
-   if (b == 0) {
-     return [1, 0, a];
-   }
-   [x,y,d] = xgcd(b, a % b);
-   return [y, x-y*Math.floor(a/b), d];
+  if (b == 0) {
+    return [1, 0, a];
+  }
+  [x,y,d] = xgcd(b, a % b);
+  return [y, x-y*Math.floor(a/b), d];
 };
 
-function rand(min,max){
-  return Math.floor( Math.random() * (max + 1 - min) ) + min ;
+function rand(min_value,max_value){
+  return Math.floor( Math.random() * (max_value + 1 - min_value) ) + min_value ;
 };
 
 Game.prototype.gen_prob = function(){
@@ -116,6 +121,7 @@ Game.prototype.gen_prob = function(){
       }
       break;
   }
+
   if(this.op != this.opes.POW){
     this.prob_str = String(this.lvalue) + this.opstr[this.op] + String(this.rvalue) + "=";
   }else{
@@ -149,28 +155,13 @@ function selected_radio_element(elemid){
   return null;
 }
 
-Game.prototype.hoge = function(){
-  return this.cnt;
-};
-
-Game.prototype.init_game = function(evt){
-  console.log("hello");
-  let kc;
-  if(document.all){
-    kc = event.keyCode;
-  }else{
-    kc = evt.which;
-  }
-  if( kc != 13 ) return;
-
-  console.log(this.hoge());
+Game.prototype.init_game = function(){
   this.cnt=0;
   this.typStart = new Date();
 
-  document.onkeydown = function(evt){
-    game.update_game(evt);
-  }
+  this.state = this.states.PLAY;
   document.getElementById("start").innerHTML = "";
+  document.getElementById("tweet").innerHTML = "";
 
   this.proboption = selected_radio_element( "diff" );
   this.mode = selected_radio_element( "mode" );
@@ -195,16 +186,18 @@ Game.prototype.validinput = function(knum){
   return this.input !== "0" && 0 <= num && num < this.modulo;
 }
 
-Game.prototype.update_game = function(evt){
-  let kc;
-  if(document.all){
-    kc = event.keyCode;
-  }else{
-    kc = evt.which;
+Game.prototype.input_num = function(num) {
+  if( this.state == this.states.PLAY && num != null && this.validinput( num ) ){
+    this.input += String(num);
+    this.show_prob();
   }
+}
 
-  if(this.input.length>=1 && kc == 13){
-    if( Number(this.input) == this.ans ){
+Game.prototype.enter = function() {
+  if( this.state == this.states.READY ){
+    this.init_game();
+  }else{
+    if( this.input != "" && Number(this.input) == this.ans ){
       this.cnt++;
       this.gen_prob();
       this.input = "";
@@ -214,54 +207,86 @@ Game.prototype.update_game = function(evt){
       }else{
         this.show_prob();
       }
-
-    }else{
+    }else if( this.input.length > 0 ){
       this.miss_num++;
       this.input = "";
       this.show_prob();
     }
   }
-  if(kc == 8 && this.input.length >= 1){
+}
+
+Game.prototype.backspace = function() {
+  if(this.state == this.states.PLAY && this.input.length >= 1){
     this.input = this.input.substr(0,this.input.length-1);
     this.show_prob();
   }
-
-  knum = key2num(kc);
-  if( knum != null && this.validinput( knum ) ){
-    this.input += String(knum);
-    this.show_prob();
-  }
-};
+}
 
 Game.prototype.end_game = function(){
+  let level = "難易度:";
+  switch(this.proboption){
+    case "arithmetic":
+      level += "低 ";
+      break;
+    case "all":
+      level += "中 ";
+      break;
+    case "muldivpow":
+      level += "高 ";
+      break;
+  }
+
   if( this.mode == this.modes.PROB ){
     this.typEnd = new Date();
     let keika = this.typEnd - this.typStart;
     let sec = Math.floor( keika/1000 );
-    let fin="終了 時間："+sec+"秒"+" ミス:"+this.miss_num+"回";
-    document.getElementById("status").innerHTML = fin;
+    text ="時間："+sec+"秒"+" ミス:"+this.miss_num+"回";
+    document.getElementById("status").innerHTML = text;
   }else{
-    let fin = "解いた数:"+this.cnt;
-    document.getElementById("status").innerHTML = fin;
+    text = "解いた問題数:"+this.cnt;
+    document.getElementById("status").innerHTML = text;
     document.getElementById("problem").innerHTML = "$" + this.prob_str + this.ans + "$" ;
     render_math();
   }
 
-  document.onkeydown = function(evt){
-    game.init_game(evt);
-  }
+  document.getElementById("start").innerHTML = "Press Enter to start";
+  let twitter_url = "http://twitter.com/intent/tweet?";
+  twitter_url += "url=https://terakun.github.io/mod13&";
+  text = level + " " + text;
+  twitter_url += "text=" + text ;
+  document.getElementById("tweet").innerHTML = '<a href="' + twitter_url + '">結果をつぶやく</a>';
+
+  this.stop_timer();
+  this.typStart = this.typEnd;
+
+  this.state = this.states.READY;
   this.cnt = 0;
   this.miss_num = 0;
   this.input = "";
   this.prob_str = "";
-  document.getElementById("start").innerHTML = "Press Enter to start";
-  this.stop_timer();
-  this.typStart = this.typEnd;
 };
 
 let game = new Game(10,60,13);
-document.onkeydown = function(evt){
-  game.init_game(evt); 
-}
 
+document.onkeydown = function(evt){
+  let kc;
+  if(document.all){
+    kc = event.keyCode;
+  }else{
+    kc = evt.which;
+  }
+
+  if(game.state == game.states.READY){
+    if(kc == 13) game.init_game();
+  }else{
+    if(kc == 13){
+      game.enter();
+    }else if(kc == 8){
+      game.backspace();
+    }else{
+      knum = key2num(kc);
+      game.input_num(knum);
+    }
+  }
+}
 

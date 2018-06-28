@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
   <script type="text/javascript" src="./mod13.js"></script>
   <link href="./mod13.css" rel="stylesheet" type="text/css">
+  <meta name="viewport" content="initial-scale=1,width=device-width">
   <head>
     <meta charset="utf-8"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" integrity="sha384-wITovz90syo1dJWVh32uuETPVEtGigN07tkttEqPv+uR2SE/mbQcG7ATL28aI9H0" crossorigin="anonymous">
@@ -17,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function(){
 // ]]></script>
   </head>
 	<body>
-    <h1>$\mathbb{F}_{13}$の計算練習(PC用)</h1>
+    <h1>$\mathbb{F}_{13}$の計算練習</h1>
     <ul>
       <li>数を入力してEnter</li>
       <li>入力は$0,1,\cdots,12$</li>
@@ -34,9 +35,51 @@ document.addEventListener("DOMContentLoaded", function(){
       <input type="radio" name="mode" value="time"> 1分間速解き
     </div>
 
-    <div id="start">Press Enter to start</div>
-    <div id="problemnumber"></div>
-    <div id="problem"></div>
-    <div id="status"></div>
+    <div style="height:80px;">
+      <div id="start">Press Enter to start</div>
+      <div id="problemnumber"></div>
+      <div id="status"></div>
+      <div id="tweet"></div>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
+
+    <div>
+      <div id="frame">
+        <div id="problem"></div>
+      </div>
+      <table id="tenkey" width="50%" height="50" align="center" style="table-layout: fixed;visibility:hidden;" border="0">
+        <tr width="100%" height="50">
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(1)">$1$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(2)">$2$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(3)">$3$</input></td>
+        </tr>
+        <tr width="100%" height="50">
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(4)">$4$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(5)">$5$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(6)">$6$</input></td>
+        </tr>
+        <tr width="100%" height="50">
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(7)">$7$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(8)">$8$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(9)">$9$</input></td>
+        </tr>
+        <tr width="100%" height="50">
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.backspace()">BS</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.input_num(0)">$0$</input></td>
+          <td ><button type="button" style="width:100%; height:100%;" onClick="game.enter()">Enter</input></td>
+        </tr>
+      </table>
+    </div>
+    <script>
+      (function(){
+        let ua = navigator.userAgent.toUpperCase();
+        if(ua.indexOf('IPHONE') != -1 || (ua.indexOf('ANDROID') != -1 && ua.indexOf('MOBILE') != -1)){
+          let elem = document.getElementById("tenkey");
+          console.log(elem);
+          elem.style.visibility ="visible";
+        }
+      }());
+    </script>
   </body>
-</html>
+</html>   
+

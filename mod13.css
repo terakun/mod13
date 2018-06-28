@@ -1,2 +1,22 @@
 div#problemnumber { font-size: 25px; }
-div#problem { font-size: 50px; }
+div#frame {
+  width:75%;
+  margin-left:auto; 
+  margin-right:auto;
+  height:75px;
+  padding: 10px;
+  margin-top:10px;
+  margin-bottom: 10px;
+  border: 1px solid #333333;
+}
+
+div#problem {
+  font-size: 50px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center; /* 縦方向中央揃え（Safari用） */
+  align-items: center; /* 縦方向中央揃え */
+  -webkit-justify-content: center; /* 横方向中央揃え（Safari用） */
+  justify-content: center; /* 横方向中央揃え */
+}
+

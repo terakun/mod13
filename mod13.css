@@ -1,17 +1,17 @@
-div#problemnumber { font-size: 25px; }
+div#problemnumber { font-size: 1.0rem; }
 div#frame {
   width:75%;
   margin-left:auto; 
   margin-right:auto;
-  height:75px;
-  padding: 10px;
-  margin-top:10px;
-  margin-bottom: 10px;
+  height:3.0rem;
+  padding: 0.1rem;
+  margin-top:0.1rem;
+  margin-bottom: 0.1rem;
   border: 1px solid #333333;
 }
 
 div#problem {
-  font-size: 50px;
+  font-size: 200%;
   display: -webkit-flex;
   display: flex;
   -webkit-align-items: center; /* 縦方向中央揃え（Safari用） */
@@ -20,3 +20,13 @@ div#problem {
   justify-content: center; /* 横方向中央揃え */
 }
 
+table#tenkey {
+  width:50%;
+  height:3.0rem;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:1.0rem;
+  margin-bottom:1.0rem;
+  table-layout: fixed;
+  visibility: hidden;
+}

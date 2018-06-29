@@ -240,7 +240,7 @@ Game.prototype.end_game = function(){
     this.typEnd = new Date();
     let keika = this.typEnd - this.typStart;
     let sec = Math.floor( keika/1000 );
-    text ="時間："+sec+"秒"+" ミス:"+this.miss_num+"回";
+    text ="時間:"+sec+"秒"+" ミス:"+this.miss_num+"回";
     document.getElementById("status").innerHTML = text;
   }else{
     text = "解いた問題数:"+this.cnt;

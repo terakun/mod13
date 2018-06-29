@@ -72,13 +72,12 @@ document.addEventListener("DOMContentLoaded", function(){
     </div>
     <script>
       (function(){
-        let ua = navigator.userAgent.toUpperCase();
-        if( ua.indexOf('iPhone') != -1 || ua.indexOf('iPad') > 0 || (ua.indexOf('ANDROID') != -1 && ua.indexOf('MOBILE') != -1)){
+        let ua = navigator.userAgent;
+        if(ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') > 0 ||ua.indexOf('iPad') > 0){
           let elem = document.getElementById("tenkey");
-          console.log(elem);
           elem.style.visibility ="visible";
         }
-      }());
+      })();
     </script>
   </body>
 </html>   

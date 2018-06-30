@@ -30,3 +30,13 @@ table#tenkey {
   table-layout: fixed;
   visibility: hidden;
 }
+
+table button{
+  width:100%;
+  height:100%;
+}
+
+div#message {
+  height:6.0rem;
+}
+

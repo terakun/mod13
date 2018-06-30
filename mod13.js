@@ -5,6 +5,8 @@ Game = function(probsize,sec,modulo) {
   this.cnt = 0;
   this.typStart = 0;
   this.typEnd = 0;
+  this.text = "";
+  this.tweet_url = "";
 
   this.op = 0;
   this.opstr = new Array("+","-","\\times","\\div","^");
@@ -123,9 +125,9 @@ Game.prototype.gen_prob = function(){
   }
 
   if(this.op != this.opes.POW){
-    this.prob_str = String(this.lvalue) + this.opstr[this.op] + String(this.rvalue) + "=";
+    this.prob_str = String(this.lvalue) + this.opstr[this.op] + String(this.rvalue) + "\\equiv";
   }else{
-    this.prob_str = String(this.lvalue) + this.opstr[this.op] + "{" +  String(this.rvalue) + "} =";
+    this.prob_str = String(this.lvalue) + this.opstr[this.op] + "{" +  String(this.rvalue) + "} \\equiv";
   }
 };
 
@@ -161,7 +163,6 @@ Game.prototype.init_game = function(){
 
   this.state = this.states.PLAY;
   document.getElementById("start").innerHTML = "";
-  document.getElementById("tweet").innerHTML = "";
 
   this.proboption = selected_radio_element( "diff" );
   this.mode = selected_radio_element( "mode" );
@@ -222,6 +223,10 @@ Game.prototype.backspace = function() {
   }
 }
 
+Game.prototype.tweet = function(){
+  window.open(this.tweet_url);
+}
+
 Game.prototype.end_game = function(){
   let level = "難易度:";
   switch(this.proboption){
@@ -236,25 +241,28 @@ Game.prototype.end_game = function(){
       break;
   }
 
+  this.text = "";
   if( this.mode == this.modes.PROB ){
     this.typEnd = new Date();
     let keika = this.typEnd - this.typStart;
     let sec = Math.floor( keika/1000 );
-    text ="時間:"+sec+"秒"+" ミス:"+this.miss_num+"回";
-    document.getElementById("status").innerHTML = text;
+    this.text ="時間:"+sec+"秒"+" ミス:"+this.miss_num+"回";
+    document.getElementById("status").innerHTML = this.text;
   }else{
-    text = "解いた問題数:"+this.cnt;
-    document.getElementById("status").innerHTML = text;
+    this.text = "解いた問題数:"+this.cnt;
+    document.getElementById("status").innerHTML = this.text;
     document.getElementById("problem").innerHTML = "$" + this.prob_str + this.ans + "$" ;
     render_math();
   }
 
   document.getElementById("start").innerHTML = "Press Enter to start";
-  let twitter_url = "http://twitter.com/intent/tweet?";
-  twitter_url += "url=https://terakun.github.io/mod13&";
-  text = level + " " + text;
-  twitter_url += "text=" + text ;
-  document.getElementById("tweet").innerHTML = '<a href="' + twitter_url + '">結果をつぶやく</a>';
+
+  this.tweet_url = "http://twitter.com/intent/tweet?";
+  this.tweet_url += "url=https://terakun.github.io/mod13&";
+  this.tweet_url += "text=" + level + " " + this.text ;
+
+  document.getElementById("modal").innerHTML = this.text;
+  $('#sampleModal').modal();
 
   this.stop_timer();
   this.typStart = this.typEnd;

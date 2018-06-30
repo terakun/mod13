@@ -263,7 +263,9 @@ Game.prototype.end_game = function(){
 
   document.getElementById("modal").innerHTML = this.text;
   $('#sampleModal').modal();
-
+  $('#sampleModal').on('shown.bs.modal', function(event) {
+    $(this).find('.modal-footer .btn-default').focus();
+  });
   this.stop_timer();
   this.typStart = this.typEnd;
 
@@ -277,6 +279,9 @@ Game.prototype.end_game = function(){
 let game = new Game(10,60,13);
 
 document.onkeydown = function(evt){
+  if(!$("#sampleModal").is(":hidden")){
+    return;
+  }
   let kc;
   if(document.all){
     kc = event.keyCode;

@@ -44,6 +44,25 @@ document.addEventListener("DOMContentLoaded", function(){
       <div id="status"></div>
     </div>
 
+    <!-- モーダル・ダイアログ -->
+    <div class="modal fade" data-backdrop="static" id="sampleModal" tabindex="-1">
+      <div class="modal-dialog" data-keyboard="true" tabindex="-1">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
+            <h4 class="modal-title">結果</h4>
+          </div>
+          <div id="modal" class="modal-body">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="game.tweet()">結果をつぶやく</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <div>
       <div id="frame">
         <div id="problem"></div>
@@ -80,23 +99,6 @@ document.addEventListener("DOMContentLoaded", function(){
         }
       })();
     </script>
-    <!-- モーダル・ダイアログ -->
-    <div class="modal fade" id="sampleModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"><span>×</span></button>
-            <h4 class="modal-title">結果</h4>
-          </div>
-          <div id="modal" class="modal-body">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="game.tweet()">結果をつぶやく</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </body>
 </html>   
 
